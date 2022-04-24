@@ -1,0 +1,7 @@
+{"db_name": "system","backup_timer": "600"}
+{"db_name": "lubm1M","backup_interval": "600","last_backup_time": "2022-03-01 16:40:16","is_backup": "false"}
+{"db_name": "lubm1M1","backup_interval": "600","last_backup_time": "2022-03-25 18:11:15","is_backup": "false"}
+{"db_name": "bbug","backup_interval": "600","last_backup_time": "2022-04-18 22:29:17","is_backup": "false"}
+{"db_name": "lubm","backup_interval": "600","last_backup_time": "2022-04-18 22:29:21","is_backup": "false"}
+{"db_name": "num","backup_interval": "600","last_backup_time": "2022-04-18 22:29:23","is_backup": "false"}
+{"db_name": "small","backup_interval": "600","last_backup_time": "2022-04-18 22:29:24","is_backup": "false"}

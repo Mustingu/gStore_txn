@@ -1,0 +1,2 @@
+{"db_name":"lubm","TID":"1","user":"root","begin_time":"1611732520001","state":"ROLLBACK","end_time":"1611732776791"}
+{"db_name":"lubm","TID":"2","user":"root","begin_time":"1611732524835","state":"ROLLBACK","end_time":"1611732783503"}
