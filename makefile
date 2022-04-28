@@ -82,7 +82,7 @@ kvstoreobj = $(objdir)KVstore.o $(sitreeobj) $(istreeobj) $(ivtreeobj) $(ivarray
 
 utilobj = $(objdir)Util.o $(objdir)Bstr.o $(objdir)Stream.o $(objdir)Triple.o $(objdir)BloomFilter.o $(objdir)VList.o \
 			$(objdir)EvalMultitypeValue.o $(objdir)IDTriple.o $(objdir)Version.o $(objdir)Transaction.o $(objdir)Latch.o $(objdir)IPWhiteList.o \
-			$(objdir)IPBlackList.o $(objdir)SpinLock.o $(objdir)SpinRWLock.o $(objdir)GraphLock.o $(objdir)MainVersion.o
+			$(objdir)IPBlackList.o $(objdir)SpinLock.o $(objdir)SpinRWLock.o $(objdir)GraphLock.o $(objdir)MainVersion.o $(objdir)LRU.o
 
 queryobj = $(objdir)SPARQLquery.o $(objdir)BasicQuery.o $(objdir)ResultSet.o  $(objdir)IDList.o \
 		   $(objdir)Varset.o $(objdir)QueryTree.o $(objdir)TempResult.o $(objdir)QueryCache.o $(objdir)GeneralEvaluation.o \
@@ -521,6 +521,9 @@ $(objdir)IPBlackList.o:  Util/IPBlackList.cpp Util/IPBlackList.h $(objdir)Util.o
 
 $(objdir)MainVersion.o:  Util/MainVersion.cpp Util/MainVersion.h
 	$(CC) $(CFLAGS) Util/MainVersion.cpp -o $(objdir)MainVersion.o $(openmp)
+
+$(objdir)LRU.o: Util/LRU.h Util/LRU.cpp
+	$(CC) $(CFLAGS) Util/LRU.cpp -o $(objdir)LRU.o $(openmp)
 
 #objects in util/ end
 

@@ -10,6 +10,7 @@
 #include "../../Util/Util.h"
 #include "../../Util/SpinLock.h"
 #include "../../Util/para.h"
+#include "../../Util/LRU.h"
 #include "IVEntry.h"
 #include "IVBlockManager.h"
 
@@ -42,14 +43,15 @@ private:
 
 	//Cache 
 	unsigned CurCacheSize;
+	spinlock SzLock;
 	//map <unsigned, long> index_time_map;
 	//multimap <long, unsigned> time_index_map;
-
+	LRU::LRUList* lru_list;
 	bool AddInCache(unsigned _key, char *_str, unsigned long _len);
 	bool SwapOut();
 	bool UpdateTime(unsigned _key, bool HasLock = false);
 
-	void RemoveFromLRUQueue(unsigned _key);
+	bool RemoveFromLRUQueue(unsigned _key);
 	
 	//mutex CacheLock;
 	std::mutex CacheLock;

@@ -29,6 +29,7 @@ IVEntry::IVEntry()
 	shared_ptr<Version> p = make_shared<Version>(0, INVALID_ID);
 	vList.push_back(p); //dummy version [0, INF)
 	clearVersionFlag();
+	lru_ptr = nullptr;
 }
 
 void

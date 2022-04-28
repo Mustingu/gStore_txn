@@ -802,8 +802,44 @@
 	    cerr << "  total: " << sm << endl << endl;
 	}
 
+
+	void lubm_query_func(Database* db)
+	{
+		string line, sparql, res;
+	    ResultSet rs;
+		const int n = 1000;
+		for(int i = 0; i < n; i++)
+			db->query(lubm_q[rand()%21], rs);
+	}
+
+	void lubm_benchmarking()
+	{
+		Util util;
+		string lubm_1M = "lubm1M";
+		Database _db(lubm_1M);
+		_db.load();
+		vector<thread> pool(threads_num);
+		int n = pool.size();
+		long start1 = Util::get_cur_time();
+		for(int i = 0 ;  i < n; i++)
+		{
+			pool[i] = thread(lubm_query_func, &_db);
+		}
+		for(int i = 0; i < n; i++)
+        {
+            pool[i].join();
+        }
+		long end1 = Util::get_cur_time();
+		cerr << end1 - start1 << " ms" << endl;
+	}
+
 	int main(int argc, char* argv[])
 	{
+		bool lubm_bench = true;
+		if(lubm_bench){
+			lubm_benchmarking();
+			return 0;
+		}
 	    //open_file();
 	    if(model == 3 ){
 	    read_triples();

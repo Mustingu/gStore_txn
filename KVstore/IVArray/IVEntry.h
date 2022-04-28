@@ -13,6 +13,7 @@
 #include "../../Util/SpinRWLock.h"
 #include "../../Util/GraphLock.h"
 #include "../../Util/para.h"
+#include "../../Util/LRU.h"
 #include "tbb/tbb.h"
 
 using namespace std;
@@ -32,6 +33,9 @@ private:
 	int prevID;
 	int nextID;
 	
+	LRU::ListNode* lru_ptr;
+	spinlock lru_mtx;
+
 	Bstr* value;
 	
 	GLatch glatch;
@@ -75,8 +79,22 @@ public:
 	void setNext(int ID);
 	int getNext() const;
 	
+	//LRU
+	void setLRUPtr(LRU::ListNode* l_ptr){
+		lru_ptr = l_ptr;
+	}
 	
-	
+	LRU::ListNode* getLRUPtr(){
+		return lru_ptr;
+	}
+
+	void LRULock(){
+		lru_mtx.lock();
+	}
+
+	void LRUUnLock(){
+		lru_mtx.unlock();
+	}
 	//MVCC
 	void setVersionFlag();
 	void clearVersionFlag();
