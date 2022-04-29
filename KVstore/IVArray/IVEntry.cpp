@@ -284,9 +284,9 @@ IVEntry::version_merge(VDataArray &addarray, VDataArray &delarray, VDataSet &Add
 bool 
 IVEntry::readVersion(VDataSet &AddSet, VDataSet &DelSet, shared_ptr<Transaction> txn, bool &latched, bool first_read)
 {
-
 	Entry_sh++;
 	IVEntry_sh[Entry_sh.load()]++;
+
 
 	if(txn->GetIsolationLevelType() == IsolationLevelType::READ_COMMITTED)
 	{

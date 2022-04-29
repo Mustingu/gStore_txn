@@ -57,7 +57,7 @@ private:
 	std::mutex CacheLock;
 	Latch ArrayLock;
 	//spinrwlock ArrayLock;
-	inline void ArraySharedLock(){ ArrayLock.lockShared();}
+	inline void ArraySharedLock(){ArrayLock.lockShared();}
 	inline void ArrayExclusiveLock(){ArrayLock.lockExclusive();};
 	inline void ArrayUnlock(){ArrayLock.unlock();}
 	//inline void ArrayUnlock(){ArrayLock.unlock(false);}

@@ -24,15 +24,15 @@
 	    }
 	};
 	const int same_data = 0;  //rw the same triple
-	const int no_update = 1;  //read-only
+	const int no_update = 0;  //read-only
 	const int txn_num = 1000;
 	const int read_num = 1;
 	const int update_num = 0;
-	const int threads_num = 16;
+	const int threads_num = 4;
 	const int oltp_query_num = 1;
 	const int oltp_update_num = 1;
 	const bool is_wat = false;
-	const int model = 2; //1:seq_txn 2:part_txn 3:oltp_txn other: no_txn
+	const int model = 3; //1:seq_txn 2:part_txn 3:oltp_txn other: no_txn
 	const string updates_path = "../insert_lubm.nt";
 	//const string updates_path = "../../../../watdiv_insert.nt";
 	const string wat_name = "wat";
@@ -352,21 +352,21 @@
 	}
 
 
-	void run_transaction_1(int isolevel, Txn_manager& txn_m, int idx)
-	{
-	    int update_lines = line_num / threads_num;
-	    int cnt = 0;
-	    int k = update_lines * idx;
-	    //cerr << "thread " << idx << "    k: " << k << endl;
-	    task1 t;
-	    string res, sparql;
-	    int base_time = 1000;
-	    txn_id_t TID;
-	    int num = 0;
-	    bool prev_succ = true;
-	    task1 tsk;
-	    long start_tv =  Util::get_cur_time();
-	    while(true){
+void run_transaction_1(int isolevel, Txn_manager& txn_m, int idx)
+{
+    int update_lines = line_num / threads_num;
+    int cnt = 0;
+    int k = update_lines * idx;
+    //cerr << "thread " << idx << "    k: " << k << endl;
+    task1 t;
+    string res, sparql;
+    int base_time = 1000;
+    txn_id_t TID;
+    int num = 0;
+    bool prev_succ = true;
+    task1 tsk;
+    long start_tv =  Util::get_cur_time();
+    while(true){
 		if(prev_succ){//reset
 		    tsk = get_task_1(txn_m, k);
 		    //print_task(tsk);
@@ -384,12 +384,12 @@
 		   // cout << "query " << i << " "  << query[i] << endl;
 		    ret = txn_m.Query(TID, query[i], res);
 		    if(ret != -100) {
-			usleep(base_time);
-			//base_time = min(base_time*2, 1000);
-			prev_succ = false;
-			//cerr << "query failed and abort!" << endl;
-			restart_times++;
-			break;
+				usleep(base_time);
+				//base_time = min(base_time*2, 1000);
+				prev_succ = false;
+				//cerr << "query failed and abort!" << endl;
+				restart_times++;
+				break;
 		    }
 		}
 		if(prev_succ == false) continue;
@@ -415,15 +415,15 @@
 		    k += update_num;
 		    cnt++;
 		    if(cnt % 10 == 0)
-			cerr << cnt << endl;
+				cerr << cnt << endl;
 		    if(cnt == 1000){
-			long end_tv =  Util::get_cur_time();
-			cerr << (end_tv - start_tv) << " ms" << endl;
-			return; 
+				long end_tv =  Util::get_cur_time();
+				cerr << (end_tv - start_tv) << " ms" << endl;
+				return; 
 		    }
 		}
-	    }
 	}
+}
 
 
 	void OLTP_workload(int isolevel, Txn_manager& txn_m, int idx)
@@ -459,7 +459,6 @@
 		//cout << "query.size()" << query.size() << " " << "updates.size()" << updates.size() << endl;
 		int ret = 0;
 		TID = txn_m.Begin(static_cast<IsolationLevelType>(isolevel));
-		
 		//int qsize = min(query.size(), oltp_query_num);
 		int j = 0;
 		for(int i  = 0; i < updates.size(); i++){
@@ -809,7 +808,9 @@
 	    ResultSet rs;
 		const int n = 1000;
 		for(int i = 0; i < n; i++)
+		{
 			db->query(lubm_q[rand()%21], rs);
+		}
 	}
 
 	void lubm_benchmarking()
@@ -833,40 +834,40 @@
 		cerr << end1 - start1 << " ms" << endl;
 	}
 
-	int main(int argc, char* argv[])
-	{
-		bool lubm_bench = true;
-		if(lubm_bench){
-			lubm_benchmarking();
-			return 0;
-		}
-	    //open_file();
-	    if(model == 3 ){
-	    read_triples();
-	    cerr << "triples read" << endl;
-	    auto tk = get_oltp_task_wat();
-	    auto qs = tk.get_query();
-	    auto us = tk.get_updates();
-	    for(int i = 0; i < qs.size(); i++) cerr << qs[i] << endl;
-	    for(int i = 0; i < us.size(); i++) cerr << us[i] << endl;
-	    }
-	    else{
+int main(int argc, char* argv[])
+{
+	bool lubm_bench = false;
+	if(lubm_bench){
+		lubm_benchmarking();
+		return 0;
+	}
+	//open_file();
+	if(model == 3 ){
+		read_triples();
+		cerr << "triples read" << endl;
+		auto tk = get_oltp_task_wat();
+		auto qs = tk.get_query();
+		auto us = tk.get_updates();
+		for(int i = 0; i < qs.size(); i++) cerr << qs[i] << endl;
+		for(int i = 0; i < us.size(); i++) cerr << us[i] << endl;
+	}
+	else{
 		open_file();
 		// auto tk = get_task();
 		// auto qs = tk.get_query();
 		// auto us = tk.get_updates();
 		// for(int i = 0; i < qs.size(); i++) cerr << qs[i] << endl;
 		// for(int i = 0; i < us.size(); i++) cerr << us[i] << endl;
-	    }
+	}
 	    // atomic<__uint128_t> l;
 	    // cerr << l.is_lock_free() << endl;
-	    Util util;
-	    string lubm_10M = "lubm10M";
-	    string lubm_100M = "lubm100M";
-	    string lubm_1M = "lubm1M";
-	    string wat_1M = "watdiv1M";
-	    string wat_10M = "watdiv10M";
-		string db_folder = "lubm";
+	Util util;
+	string lubm_10M = "lubm10M";
+	string lubm_100M = "lubm100M";
+	string lubm_1M = "lubm1M";
+    string wat_1M = "watdiv1M";
+    string wat_10M = "watdiv10M";
+	string db_folder = "lubm";
 	    
 	Database _db(lubm_1M);
 	_db.load();
@@ -888,7 +889,7 @@
     else if(model == 2){
         for(int i = 0; i < n ; i++)
         {
-            pool[i] = thread(run_transaction_1, 2 , ref(txn_m), i);
+            pool[i] = thread(run_transaction_1, 1 , ref(txn_m), i);
         }
     }
     else if(model == 3){
@@ -914,9 +915,9 @@
         }
     }
     long end1 = Util::get_cur_time();
-    cerr << end1 - start1 << "ms" << endl;
+    cerr << end1 - start1 << "ms";
 	cerr.precision(4);
-	cerr << "tps:" << 1.0 * (threads_num * txn_num) /  (1.0 * (end1 - start1)) << endl;
+	cerr << "(" << 1000.0 * (threads_num * txn_num) /  (1.0 * (end1 - start1)) << ")" << endl;
     ofstream ttime;
     ttime.open("time.txt", ios::out);
     ttime << end1 - start1 << "sms" << endl;

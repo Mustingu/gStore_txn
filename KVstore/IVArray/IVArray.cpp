@@ -533,7 +533,6 @@ IVArray::search(unsigned _key, char *& _str, unsigned long & _len, VDataSet& Add
 
 	Array_sh++;
 	IVArray_sh[Array_sh.load()]++;
-
 	ArraySharedLock();
 	//printf("%s search %d: ", filename.c_str(), _key);
 	if (_key >= CurEntryNum)
@@ -550,8 +549,10 @@ IVArray::search(unsigned _key, char *& _str, unsigned long & _len, VDataSet& Add
 
 		return false;
 	}
+	
 	// try to read in main memory
 	bool ret = array[_key].readVersion(AddSet, DelSet, txn, latched, is_firstread);
+	
 	bool is_empty = (AddSet.size() == 0 && DelSet.size() == 0);
 	
 	if(ret == false) {
@@ -584,7 +585,6 @@ IVArray::search(unsigned _key, char *& _str, unsigned long & _len, VDataSet& Add
 		if(is_empty) return false;
 		else return true;
 	}
-	
 	array[_key].LRULock();
 	if (array[_key].inCache())
 	{
@@ -603,7 +603,7 @@ IVArray::search(unsigned _key, char *& _str, unsigned long & _len, VDataSet& Add
 
 		return ret;
 	}
-	
+	array[_key].LRUUnLock();
 	// read in disk
 	unsigned store = array[_key].getStore();
 	if (!BM->ReadValue(store, _str, _len))
@@ -618,6 +618,7 @@ IVArray::search(unsigned _key, char *& _str, unsigned long & _len, VDataSet& Add
 
 		return true;
 	}
+
 			AddInCache(_key, _str, _len);
 			char *debug = new char [_len];
 			memcpy(debug, _str, _len);
